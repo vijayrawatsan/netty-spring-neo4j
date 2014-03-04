@@ -40,10 +40,31 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.2</version>
+		</dependency>
+
 		<!-- Extras -->
-		
+
+		<!-- Validation -->
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>eclipselink</artifactId>
+			<version>2.5.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>5.0.3.Final</version>
+		</dependency>
+
+		<!-- Validation -->
+
 		<!-- Database Related -->
-		
+
 		<dependency>
 			<groupId>c3p0</groupId>
 			<artifactId>c3p0</artifactId>
@@ -51,7 +72,7 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
@@ -59,7 +80,7 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-jpa</artifactId>
@@ -71,9 +92,9 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.29</version>
 		</dependency>
-		<!-- Database Related -->	
-			
-		<!-- JSON Start-->
+		<!-- Database Related -->
+
+		<!-- JSON Start -->
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-core-asl</artifactId>
@@ -89,8 +110,14 @@
 			<artifactId>jackson-jaxrs</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
-		<!-- JSON End-->
-		
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
+		<!-- JSON End -->
+
 		<!-- Spring -->
 
 		<dependency>
@@ -98,7 +125,7 @@
 			<artifactId>spring-webmvc</artifactId>
 			<version>${springframework.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
@@ -107,8 +134,11 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Spring  -->
-		
+		<!-- Spring -->
+		<!-- FB -->
+		<!-- <dependency> <groupId>org.facebook4j</groupId> <artifactId>facebook4j-core</artifactId> 
+			<version>[2.0,)</version> </dependency> -->
+		<!-- FB -->
 		<!-- JavaEE APIs/Servlet 3 jar -->
 
 		<dependency>
@@ -116,9 +146,9 @@
 			<artifactId>javax.servlet-api</artifactId>
 			<version>3.0.1</version>
 		</dependency>
-		
+
 		<!-- JavaEE APIs/Servlet 3 jar -->
-		
+
 	</dependencies>
 	<build>
 		<plugins>
@@ -152,7 +182,7 @@
 				<version>9.0.6.v20130930</version>
 				<configuration>
 					<httpConnector>
-						<port>8090</port>
+						<port>8080</port>
 						<host>localhost</host>
 					</httpConnector>
 					<scanIntervalSeconds>10</scanIntervalSeconds>

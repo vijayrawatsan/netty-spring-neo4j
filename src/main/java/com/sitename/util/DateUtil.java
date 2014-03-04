@@ -1,4 +1,4 @@
-package com.sitename.domain;
+package com.sitename.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

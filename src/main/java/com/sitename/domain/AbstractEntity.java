@@ -10,6 +10,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
+import com.sitename.util.DateUtil;
+
 @MappedSuperclass
 public class AbstractEntity {
 
