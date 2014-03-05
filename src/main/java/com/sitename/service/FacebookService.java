@@ -1,5 +1,8 @@
 package com.sitename.service;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
@@ -11,19 +14,21 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.sitename.domain.User;
+import com.sitename.util.DateUtil;
 import com.sitename.util.RestTemplateUtil;
 import com.sitename.util.Utils;
 
 @Service
 public class FacebookService {
 
+
     private static final Logger LOGGER       = LoggerFactory.getLogger(FacebookService.class);
 
     private RestTemplate        restTemplate = RestTemplateUtil.getInstance();
-    
+
     @Autowired
-    private UserService userService;
-    
+    private UserService         userService;
+
     @Value(value = "${fb.oauth.appId}")
     private String              appId;
 
@@ -45,7 +50,9 @@ public class FacebookService {
     @Value(value = "${fb.graphurl.me}")
     private String              graphUrl;
 
+    private static final int SIGNATURE_EXPIRY_DAYS = 15;
     private static final String ACCESS_TOKEN = "access_token";
+    private static final String EXPIRES      = "expires";
 
     public String getOAuthUrl() {
         return loginUrl + "&client_id=" + appId + "&scope=" + permissions + "&redirect_uri=" + callbackUrl;
@@ -59,6 +66,8 @@ public class FacebookService {
             return null;
         }
         String accessToken = Utils.getParamValue(response, ACCESS_TOKEN, null);
+        int expires = Integer.parseInt(Utils.getParamValue(response, EXPIRES, null));
+        Date accessTokenExpiry = DateUtil.getDate(DateUtil.getCurrentDateInIST(), Calendar.SECOND, expires - 60);
         if(StringUtils.isEmpty(accessToken)) {
             return null;
         }
@@ -67,19 +76,25 @@ public class FacebookService {
         if(userJson == null) {
             return null;
         }
-        User user = new User();
-        user.setFirstName((String) userJson.get("first_name"));
-        user.setLastName((String) userJson.get("last_name"));
-        user.setGender((String) userJson.get("gender"));
-        user.setEmail((String) userJson.get("email"));
-        user.setUserName((String) userJson.get("username"));
-        user.setFacebookId((String) userJson.get("id"));
-        User fromDB = userService.findByUserName(user.getUserName());
+        String userName = (String) userJson.get("username");
+        User fromDB = userService.findByUserName(userName);
         if(fromDB == null) {
-            user.setPassword(Utils.generateRandomPassword());
-            user.setActive(true);
-            fromDB = userService.save(user);
+            fromDB = new User();
+            fromDB.setFirstName((String) userJson.get("first_name"));
+            fromDB.setLastName((String) userJson.get("last_name"));
+            fromDB.setGender((String) userJson.get("gender"));
+            fromDB.setEmail((String) userJson.get("email"));
+            fromDB.setUserName(userName);
+            fromDB.setFacebookId((String) userJson.get("id"));
+            fromDB.setPassword(Utils.generateRandomPassword());
+            fromDB.setActive(true);
         }
+        // Update these 4 values in both cases
+        fromDB.setFacebookAccessToken(accessToken);
+        fromDB.setFacebookAccessTokenExpiry(accessTokenExpiry);
+        fromDB.setSignature(Utils.getHex(Utils.nextSessionId()+userName));
+        fromDB.setSignatureExipry(DateUtil.getDate(DateUtil.getCurrentDateInIST(), Calendar.DATE, SIGNATURE_EXPIRY_DAYS));
+        fromDB = userService.save(fromDB);
         return fromDB;
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.sitename.domain.User;
 import com.sitename.repository.UserRepository;
+import com.sitename.util.DateUtil;
 
 @Service
 public class UserService {
@@ -25,7 +26,11 @@ public class UserService {
     public User findByUserName(String userName) {
         return userRepository.findByUserName(userName);
     }
-
+    
+    public User findBySignature(String signature) {
+        return userRepository.findBySignatureAndSignatureExipryIsAfter(signature, DateUtil.getCurrentDateInIST());
+    }
+    
     public User save(User user) {
         return userRepository.save(user);
     }

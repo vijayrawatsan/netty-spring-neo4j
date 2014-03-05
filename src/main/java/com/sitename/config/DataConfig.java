@@ -1,7 +1,5 @@
 package com.sitename.config;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +13,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.jolbox.bonecp.BoneCPDataSource;
 
 @Configuration
 @EnableTransactionManagement
@@ -41,24 +39,27 @@ public class DataConfig {
 
         return factory;
     }
-
+    /**
+     * Better performance than C3P0 and DBCP.
+     * Fine tune as per requirements.
+     * {@link http://jolbox.com/}
+     * @return
+     */
     @Bean
-    public DataSource dataSource() {
-        try {
-            ComboPooledDataSource ds = new ComboPooledDataSource();
-            ds.setDriverClass(env.getRequiredProperty("app.jdbc.driverClassName"));
-            ds.setJdbcUrl(env.getRequiredProperty("app.jdbc.url"));
-            ds.setUser(env.getRequiredProperty("app.jdbc.username"));
-            ds.setPassword(env.getRequiredProperty("app.jdbc.password"));
-            ds.setAcquireIncrement(5);
-            ds.setIdleConnectionTestPeriod(60);
-            ds.setMaxPoolSize(100);
-            ds.setMaxStatements(50);
-            ds.setMinPoolSize(10);
-            return ds;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public BoneCPDataSource dataSource() {
+        BoneCPDataSource boneCPDataSource = new BoneCPDataSource();
+        boneCPDataSource.setDriverClass(env.getProperty("app.jdbc.driverClassName"));
+        boneCPDataSource.setJdbcUrl(env.getProperty("app.jdbc.url"));
+        boneCPDataSource.setUsername(env.getProperty("app.jdbc.username"));
+        boneCPDataSource.setPassword(env.getProperty("app.jdbc.password"));
+        boneCPDataSource.setIdleConnectionTestPeriodInMinutes(60);
+        boneCPDataSource.setIdleMaxAgeInMinutes(420);
+        boneCPDataSource.setMaxConnectionsPerPartition(30);
+        boneCPDataSource.setMinConnectionsPerPartition(10);
+        boneCPDataSource.setPartitionCount(3);
+        boneCPDataSource.setAcquireIncrement(5);
+        boneCPDataSource.setStatementsCacheSize(100);
+        return boneCPDataSource;
     }
     
     @Bean

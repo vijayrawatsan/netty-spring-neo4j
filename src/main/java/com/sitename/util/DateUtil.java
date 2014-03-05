@@ -31,7 +31,14 @@ public class DateUtil {
         c.add(Calendar.DATE, 1);
         return offsetTimeZone(c.getTime(), TimeZone.getDefault().getID(), ASIA_CALCUTTA);
     }
-
+    
+    public static Date getDate(Date date, int period, int val) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("IST"));
+        calendar.setTime(date);
+        calendar.add(period, val);
+        return calendar.getTime();
+    }
+    
     private static Date offsetTimeZone(Date date, String fromTZ, String toTZ) {
 
         // Construct FROM and TO TimeZone instances

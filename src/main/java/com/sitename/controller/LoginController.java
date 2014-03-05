@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.sitename.domain.User;
 import com.sitename.service.FacebookService;
 import com.sitename.util.RestResponse;
+import com.sitename.util.UserDto;
 
 @Controller
 @RequestMapping("/login")
@@ -42,8 +43,7 @@ class LoginController {
             if(!StringUtils.isEmpty(code)) {
                 User user = facebookService.getUser(code);
                 if(user != null) {
-                    //TODO-Return custom user DTO
-                    response = new ResponseEntity<RestResponse>(new RestResponse(Boolean.TRUE, null, user), HttpStatus.OK);
+                    response = new ResponseEntity<RestResponse>(new RestResponse(Boolean.TRUE, null, new UserDto(user)), HttpStatus.OK);
                 } else {
                     response = new ResponseEntity<RestResponse>(new RestResponse(Boolean.FALSE, new ArrayList<String>() {{ add(errorReason); add(error); add(errorDescription); }}, null), HttpStatus.INTERNAL_SERVER_ERROR);
                 }

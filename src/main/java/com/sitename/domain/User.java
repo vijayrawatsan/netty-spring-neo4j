@@ -1,11 +1,13 @@
 package com.sitename.domain;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 
 @Entity
 public class User extends AbstractEntity {
-
+    //TODO-Index data for sure
     private String firstName;
 
     private String lastName;
@@ -21,6 +23,15 @@ public class User extends AbstractEntity {
 
     @NotNull
     private String gender;
+    
+    //TODO-When scaling use a separate Redis Cluster for this functionality
+    private String signature;
+    
+    private Date signatureExipry;
+    
+    private Date facebookAccessTokenExpiry;
+    
+    private String facebookAccessToken;
     
     private String facebookId;
 
@@ -82,6 +93,38 @@ public class User extends AbstractEntity {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getFacebookAccessToken() {
+        return facebookAccessToken;
+    }
+
+    public void setFacebookAccessToken(String facebookAccessToken) {
+        this.facebookAccessToken = facebookAccessToken;
+    }
+
+    public Date getSignatureExipry() {
+        return signatureExipry;
+    }
+
+    public void setSignatureExipry(Date signatureExipry) {
+        this.signatureExipry = signatureExipry;
+    }
+
+    public Date getFacebookAccessTokenExpiry() {
+        return facebookAccessTokenExpiry;
+    }
+
+    public void setFacebookAccessTokenExpiry(Date facebookAccessTokenExpiry) {
+        this.facebookAccessTokenExpiry = facebookAccessTokenExpiry;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 
 }
