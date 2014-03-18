@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.sitename</groupId>
-	<artifactId>starter</artifactId>
+	<artifactId>nstarter</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 
@@ -48,55 +48,29 @@
 
 		<!-- Extras -->
 
-		<!-- Validation -->
-		<dependency>
-			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>eclipselink</artifactId>
-			<version>2.5.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>5.0.3.Final</version>
-		</dependency>
-
-		<!-- Validation -->
-
 		<!-- Database Related -->
-
 		<dependency>
-			<groupId>com.mchange</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>0.9.5-pre6</version>
+	<groupId>javax.validation</groupId>
+	<artifactId>validation-api</artifactId>
+	<version>1.1.0.Final</version>
+</dependency>
+            <dependency>
+	<groupId>javassist</groupId>
+	<artifactId>javassist</artifactId>
+	<version>3.12.1.GA</version>
+</dependency>
+            
+		<dependency>
+	        <groupId>org.springframework.data</groupId>
+	        <artifactId>spring-data-neo4j</artifactId>
+	        <version>3.0.1.RELEASE</version>
+	    </dependency>
+	    <dependency>
+		   <groupId>org.springframework.data</groupId>
+		   <artifactId>spring-data-neo4j-rest</artifactId>
+		   <version>3.0.1.RELEASE</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.jolbox</groupId>
-			<artifactId>bonecp</artifactId>
-			<version>0.8.0.RELEASE</version>
-		</dependency>
-
-
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<version>${hibernate.version}</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-jpa</artifactId>
-			<version>${spring.data.jpa.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.29</version>
-		</dependency>
 		<!-- Database Related -->
 
 		<!-- JSON Start -->
@@ -124,7 +98,7 @@
 		<!-- JSON End -->
 
 		<!-- Spring -->
-
+		<!-- Added just for restTemplate -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
@@ -140,26 +114,30 @@
 		</dependency>
 
 		<!-- Spring -->
-		<!-- FB -->
-		<!-- <dependency> <groupId>org.facebook4j</groupId> <artifactId>facebook4j-core</artifactId> 
-			<version>[2.0,)</version> </dependency> -->
-		<!-- FB -->
-		<!-- JavaEE APIs/Servlet 3 jar -->
-
+		<!-- Netty jar -->
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.0.1</version>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>4.0.17.Final</version>
 		</dependency>
 
-		<!-- JavaEE APIs/Servlet 3 jar -->
+		<!-- Netty jar -->
 
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>spring-snapshots</id>
+			<name>Spring Snapshots</name>
+			<url>http://repo.spring.io/snapshot</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	<build>
 		<plugins>
 
 			<!-- Compiler -->
-
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
@@ -169,30 +147,6 @@
 				</configuration>
 			</plugin>
 
-			<!-- WAR -->
-
-			<plugin>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-				</configuration>
-			</plugin>
-
-			<!-- Jetty -->
-
-			<plugin>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>
-				<version>9.0.6.v20130930</version>
-				<configuration>
-					<httpConnector>
-						<port>8080</port>
-						<host>localhost</host>
-					</httpConnector>
-					<scanIntervalSeconds>10</scanIntervalSeconds>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 </project>

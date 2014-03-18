@@ -1,14 +1,9 @@
 package com.sitename.repository;
 
-import java.util.Date;
-
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.neo4j.repository.GraphRepository;
 
 import com.sitename.domain.User;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends GraphRepository<User> {
 
-    User findByUserName(String userName);
-    
-    User findBySignatureAndSignatureExipryIsAfter(String signature, Date date);
 }

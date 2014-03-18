@@ -1,0 +1,102 @@
+package com.sitename.handlers;
+
+import static io.netty.handler.codec.http.HttpHeaders.is100ContinueExpected;
+import static io.netty.handler.codec.http.HttpHeaders.isKeepAlive;
+import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
+import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
+import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
+import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders.Values;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+
+@Component
+@Qualifier("httpServerHandler")
+@Sharable
+public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
+
+    private Map<String, RequestHandler> singletonHandlerMap = new HashMap<String, RequestHandler>();
+
+    @Autowired
+    private List<RequestHandler>        controllers;
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        ctx.flush();
+    }
+
+    @Override
+    public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+        // Get or post without content
+        if(msg instanceof HttpRequest) {
+            HttpRequest req = (HttpRequest) msg;
+
+            if(is100ContinueExpected(req)) {
+                ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
+            }
+
+            String uri = req.getUri();
+
+            if("/favicon.ico".equals(uri)) {
+                FullHttpResponse res = new DefaultFullHttpResponse(HTTP_1_1, NOT_FOUND);
+                sendResponse(ctx, (FullHttpRequest) req, res);
+                return;
+            }
+
+            QueryStringDecoder queryStringDecoder = new QueryStringDecoder(uri);
+            String path = queryStringDecoder.path();
+            
+            RequestHandler requestHandler = getHandler(path);
+            FullHttpResponse response = requestHandler.handleRequest(uri, null, req);
+            
+            sendResponse(ctx, req, response);
+        }
+    }
+
+    private void sendResponse(ChannelHandlerContext ctx, HttpRequest req, FullHttpResponse response) {
+        boolean keepAlive = isKeepAlive(req);
+        if (!keepAlive) {
+            ctx.write(response).addListener(ChannelFutureListener.CLOSE);
+        } else {
+            response.headers().set(CONNECTION, Values.KEEP_ALIVE);
+            ctx.write(response);
+        }
+    }
+
+    private RequestHandler getHandler(String path) {
+        RequestHandler result = singletonHandlerMap.get(path);
+        if(result != null) {
+            return result;
+        }
+        for(RequestHandler handler : controllers) {
+            if(path.matches(handler.getClass().getAnnotation(Controller.class).value())) {
+                singletonHandlerMap.put(path, handler);
+                result = handler;
+                break;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
+    }
+}

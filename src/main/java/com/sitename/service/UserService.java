@@ -16,21 +16,13 @@ public class UserService {
     private UserRepository userRepository;
 
     public List<User> findAll() {
-        return userRepository.findAll();
+        return (List<User>) userRepository.findAll();
     }
 
     public User findById(Long id) {
         return userRepository.findOne(id);
     }
 
-    public User findByUserName(String userName) {
-        return userRepository.findByUserName(userName);
-    }
-    
-    public User findBySignature(String signature) {
-        return userRepository.findBySignatureAndSignatureExipryIsAfter(signature, DateUtil.getCurrentDateInIST());
-    }
-    
     public User save(User user) {
         return userRepository.save(user);
     }

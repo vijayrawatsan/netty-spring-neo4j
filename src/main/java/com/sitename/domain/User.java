@@ -1,130 +1,68 @@
 package com.sitename.domain;
 
 import java.util.Date;
+import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.validation.constraints.NotNull;
+import org.neo4j.graphdb.Direction;
+import org.springframework.data.neo4j.annotation.GraphId;
+import org.springframework.data.neo4j.annotation.Indexed;
+import org.springframework.data.neo4j.annotation.NodeEntity;
+import org.springframework.data.neo4j.annotation.RelatedTo;
 
-@Entity
-public class User extends AbstractEntity {
-    //TODO-Index data for sure
-    private String firstName;
+@NodeEntity
+public class User {
 
-    private String lastName;
+    @GraphId
+    Long              id;
 
-    @NotNull
-    private String email;
+    @Indexed
+    private String    login;
 
-    @NotNull
-    private String userName;
-    
-    @NotNull
-    private String password;
+    private String    fullName;
 
-    @NotNull
-    private String gender;
-    
-    //TODO-When scaling use a separate Redis Cluster for this functionality
-    private String signature;
-    
-    private Date signatureExipry;
-    
-    private Date facebookAccessTokenExpiry;
-    
-    private String facebookAccessToken;
-    
-    private String facebookId;
+    private Date      lastLogin;
 
-    public User() {
-        super();
+    @RelatedTo(type = "knows", direction = Direction.OUTGOING)
+    private Set<User> friends;
+
+    public Long getId() {
+        return id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public String getLogin() {
+        return login;
     }
 
-    public String getLastName() {
-        return lastName;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public String getFullName() {
+        return fullName;
     }
 
-    public String getEmail() {
-        return email;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public Date getLastLogin() {
+        return lastLogin;
     }
 
-    public String getUserName() {
-        return userName;
+    public void setLastLogin(Date lastLogin) {
+        this.lastLogin = lastLogin;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public Set<User> getFriends() {
+        return friends;
     }
 
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getFacebookId() {
-        return facebookId;
-    }
-
-    public void setFacebookId(String facebookId) {
-        this.facebookId = facebookId;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getFacebookAccessToken() {
-        return facebookAccessToken;
-    }
-
-    public void setFacebookAccessToken(String facebookAccessToken) {
-        this.facebookAccessToken = facebookAccessToken;
-    }
-
-    public Date getSignatureExipry() {
-        return signatureExipry;
-    }
-
-    public void setSignatureExipry(Date signatureExipry) {
-        this.signatureExipry = signatureExipry;
-    }
-
-    public Date getFacebookAccessTokenExpiry() {
-        return facebookAccessTokenExpiry;
-    }
-
-    public void setFacebookAccessTokenExpiry(Date facebookAccessTokenExpiry) {
-        this.facebookAccessTokenExpiry = facebookAccessTokenExpiry;
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
+    public void setFriends(Set<User> friends) {
+        this.friends = friends;
     }
 
 }
