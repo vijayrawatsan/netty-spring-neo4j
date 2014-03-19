@@ -1,9 +1,11 @@
 package com.sitename.handlers;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import io.netty.channel.ChannelInitializer;
@@ -64,12 +66,11 @@ import io.netty.util.concurrent.EventExecutorGroup;
  */
 @Component
 @Qualifier("httpServerInitializer")
-public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
+public class HttpServerInitializer extends ChannelInitializer<SocketChannel> implements ApplicationContextAware {
 
-    static final EventExecutorGroup eventExecutorGroup = new DefaultEventExecutorGroup(8);
+    final EventExecutorGroup eventExecutorGroup = new DefaultEventExecutorGroup(100);
     
-    @Autowired
-    private HttpServerHandler     httpServerHandler;
+    private ApplicationContext  applicationContext;
     
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
@@ -78,9 +79,14 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast("encoder", new HttpResponseEncoder());
         pipeline.addLast("decoder", new HttpRequestDecoder());
         pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
-        pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
-        pipeline.addLast("cors", new CorsHandler(corsConfig));
-        pipeline.addLast(eventExecutorGroup, "handler", httpServerHandler);
+        //pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
+        //pipeline.addLast("cors", new CorsHandler(corsConfig));
+        pipeline.addLast(eventExecutorGroup, "handler", new HttpServerHandler(this.applicationContext));
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+        this.applicationContext = ctx;
     }
 
 }

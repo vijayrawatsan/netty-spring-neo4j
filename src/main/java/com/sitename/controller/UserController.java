@@ -41,11 +41,9 @@ public class UserController implements RequestHandler {
                 user.setLastLogin(new Date());
                 user.setLogin("vijayrawatsan");
                 
-//                User save = userRepository.save(user);
                 return getFullHttpResponse(user);
             }
-        } else if(request.getMethod().equals(HttpMethod.GET)) {
-            if(requestUri.matches("/v1/users.*")) {
+            else  if(requestUri.matches("/v1/users.*")) {
                 User user = new User();
                 user.setFriends(null);
                 user.setFullName("Vijay Rawat");
