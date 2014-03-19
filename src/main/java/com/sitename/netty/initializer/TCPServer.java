@@ -1,4 +1,4 @@
-package com.sitename.initializer;
+package com.sitename.netty.initializer;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;

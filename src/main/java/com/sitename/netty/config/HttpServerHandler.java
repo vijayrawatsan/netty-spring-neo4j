@@ -1,4 +1,4 @@
-package com.sitename.handlers;
+package com.sitename.netty.config;
 
 import static io.netty.handler.codec.http.HttpHeaders.is100ContinueExpected;
 import static io.netty.handler.codec.http.HttpHeaders.isKeepAlive;
@@ -9,6 +9,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -20,21 +21,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
+import com.sitename.handlers.RequestHandler;
+
+@Sharable
+@Component
 public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 
     private Map<String, RequestHandler> singletonHandlerMap = new HashMap<String, RequestHandler>();
 
+    @Autowired
     private List<RequestHandler>        controllers;
     
-    private ApplicationContext applicationContext;
-
-    public HttpServerHandler(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
-
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         ctx.flush();
@@ -61,7 +62,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
             QueryStringDecoder queryStringDecoder = new QueryStringDecoder(uri);
             String path = queryStringDecoder.path();
             
-            RequestHandler requestHandler = lookupUrlHandler(path);
+            RequestHandler requestHandler = getHandler(path);
             FullHttpResponse response = requestHandler.handleRequest(uri, null, req);
             
             sendResponse(ctx, req, response);
@@ -93,29 +94,29 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
         return result;
     }
     
-    public RequestHandler lookupUrlHandler(String url) {
-        RequestHandler handler = singletonHandlerMap.get(url);
-        if(handler != null) {
-            return handler;
-        }
-        String[] beanDefinitionNames = this.applicationContext.getBeanDefinitionNames();
-        for(String beanName : beanDefinitionNames) {
-            Object obj = this.applicationContext.getBean(beanName);
-            if(obj == null) {
-                continue;// spring is mad giving null all over places
-            }
-            Controller controller = obj.getClass().getAnnotation(Controller.class);
-            if(controller != null) {
-                if(url.matches(controller.value())) {
-                    handler = (RequestHandler) obj;
-                    singletonHandlerMap.put(url, handler);
-                    return handler;
-                }
-            }
-        }
-
-        return null;
-    }
+//    public RequestHandler lookupUrlHandler(String url) {
+//        RequestHandler handler = singletonHandlerMap.get(url);
+//        if(handler != null) {
+//            return handler;
+//        }
+//        String[] beanDefinitionNames = this.applicationContext.getBeanDefinitionNames();
+//        for(String beanName : beanDefinitionNames) {
+//            Object obj = this.applicationContext.getBean(beanName);
+//            if(obj == null) {
+//                continue;// spring is mad giving null all over places
+//            }
+//            Controller controller = obj.getClass().getAnnotation(Controller.class);
+//            if(controller != null) {
+//                if(url.matches(controller.value())) {
+//                    handler = (RequestHandler) obj;
+//                    singletonHandlerMap.put(url, handler);
+//                    return handler;
+//                }
+//            }
+//        }
+//
+//        return null;
+//    }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

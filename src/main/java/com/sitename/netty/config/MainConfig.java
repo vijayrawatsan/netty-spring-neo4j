@@ -1,4 +1,4 @@
-package com.sitename.config;
+package com.sitename.netty.config;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelOption;
@@ -10,31 +10,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.data.neo4j.config.EnableNeo4jRepositories;
-import org.springframework.data.neo4j.config.Neo4jConfiguration;
-import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
-import org.springframework.data.neo4j.support.Neo4jTemplate;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import com.sitename.handlers.HttpServerInitializer;
 
 @Configuration
 @PropertySource(value = { "classpath:netty-server.properties" })
-@ComponentScan(basePackages = "com.sitename")
-@EnableTransactionManagement(mode=AdviceMode.PROXY)
-@EnableNeo4jRepositories(basePackages = {"com.sitename.repository"})
-public class MainConfig extends Neo4jConfiguration {
+@ComponentScan(basePackages = "com.sitename.netty")
+public class MainConfig {
 
     @Value("${boss.thread.count}")
     private int                   bossCount;
@@ -54,21 +43,7 @@ public class MainConfig extends Neo4jConfiguration {
     @Autowired
     @Qualifier("httpServerInitializer")
     private HttpServerInitializer httpServerInitializer;
-    @Autowired
-    private ApplicationContext  applicationContext;
 
-    @Bean(destroyMethod = "shutdown")
-    public GraphDatabaseService graphDatabaseService() {
-        return new SpringRestGraphDatabase("http://localhost:7474/db/data/");
-    }
-    @Bean
-    public Neo4jTemplate neo4jTemplate() {
-        Neo4jTemplate neo4jTemplate = new Neo4jTemplate(graphDatabaseService());
-        neo4jTemplate.setApplicationContext(applicationContext);
-        System.out.println("yoyo");
-        return neo4jTemplate;
-    }
-    
     @SuppressWarnings("unchecked")
     @Bean(name = "serverBootstrap")
     public ServerBootstrap bootstrap() {

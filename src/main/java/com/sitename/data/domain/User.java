@@ -1,4 +1,4 @@
-package com.sitename.domain;
+package com.sitename.data.domain;
 
 import java.util.Date;
 import java.util.Set;

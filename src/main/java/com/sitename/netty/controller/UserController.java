@@ -1,4 +1,4 @@
-package com.sitename.controller;
+package com.sitename.netty.controller;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
@@ -13,23 +13,15 @@ import io.netty.handler.codec.http.HttpRequest;
 import java.util.Date;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import com.sitename.domain.User;
+import com.sitename.data.domain.User;
+import com.sitename.data.service.UserService;
 import com.sitename.handlers.RequestHandler;
-import com.sitename.repository.UserRepository;
-import com.sitename.service.UserService;
 
 @Controller("/(v1|v2|v3)/users.*")
 public class UserController implements RequestHandler {
 
-    @Autowired
-    private UserService userService;
-    
-    @Autowired
-    private UserRepository userRepository;
-    
     @Override
     public FullHttpResponse handleRequest(String requestUri, String requestPayload, HttpRequest request) throws Exception {
         
@@ -44,14 +36,7 @@ public class UserController implements RequestHandler {
                 return getFullHttpResponse(user);
             }
             else  if(requestUri.matches("/v1/users.*")) {
-                User user = new User();
-                user.setFriends(null);
-                user.setFullName("Vijay Rawat");
-                user.setLastLogin(new Date());
-                user.setLogin("vijayrawatsan");
-                
-                User save = userRepository.save(user);
-                return getFullHttpResponse(save);
+                return getFullHttpResponse(UserService.getInstance().findAll());
             }
         }
         return null;
